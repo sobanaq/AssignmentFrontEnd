@@ -5,7 +5,8 @@ const getMessages = async () => {
   resultElement.textContent = "Loading...";
 
   try {
-    const response = await fetch(`/api/messages`, {
+    console.log("trying get messages")
+    const response = await fetch(`/api/get_books`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
