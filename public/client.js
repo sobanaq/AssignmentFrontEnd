@@ -170,4 +170,5 @@ const fetchData = async (url) => {
   document.getElementById("postMessage").addEventListener("click", () => postData("/api/new_message", { message: "Hello from the frontend!" }));
   document.getElementById("updateMessage").addEventListener("click", () => updateData("/api/update_message", { id: 1, message: "Updated message!" }));
   document.getElementById("deleteMessage").addEventListener("click", () => deleteData("/api/delete_message?id=1"));
+  document.getElementById("getBooks").addEventListener("click", () => fetchData("/api/get_books"));
   
