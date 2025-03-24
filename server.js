@@ -41,6 +41,31 @@ app.post('/api/new_book', async (req, res) => {
   }
 });
 
+//Delete endpoint
+app.delete('/api/delete_book', async (req, res) => {
+  try {
+
+    // Call the Supabase Edge Function for messages
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/books`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify(req.body)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('GET request error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // New GET endpoint
 app.get('/api/get_books', async (req, res) => {
   try {

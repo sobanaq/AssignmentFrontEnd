@@ -111,7 +111,26 @@ const fetchData = async (url) => {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data = await response.json();
-        resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        //resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        const rowsData = data.map(entry => {
+            return (
+                `<tr>
+                <td>${entry.title}</td>
+                <td>${entry.author}</td>
+                <td>${entry.ISBN}</td>
+                <td> <button onclick="deleteData('/api/delete_book', {id:${entry.id}})" id="deleteBook">Delete Book</button></td>
+                </tr>`
+            )
+        })
+        resultElement.innerHTML = `<table>
+        <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>ISBN</th>
+        <th></th>
+        </tr>
+${rowsData}
+</table>`;
     } catch (error) {
         resultElement.textContent = `Error: ${error.message}`;
     }
@@ -153,11 +172,11 @@ const fetchData = async (url) => {
   };
   
   // Delete Message
-  const deleteData = async (url) => {
+  const deleteData = async (url,body) => {
     const resultElement = document.getElementById("result");
     resultElement.textContent = "Deleting...";
     try {
-        const response = await fetch(url, { method: "DELETE" });
+        const response = await fetch(url, { method: "DELETE" , body: JSON.stringify(body)});
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data = await response.json();
         resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
