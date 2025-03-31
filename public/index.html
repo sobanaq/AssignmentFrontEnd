@@ -16,7 +16,7 @@
 
 
   <label for="title">Book title:</label><br>
-  <input type="text" id="title" ><br>
+  <input type="text" id="title"><br>
   <label for="author">Author:</label><br>
   <input type="text" id="author" ><br><br>
   <button onclick="postData('/api/new_book', { title: document.getElementById('title').value, author: document.getElementById('author').value })" id="postBook">Post New Book</button>

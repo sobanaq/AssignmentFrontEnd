@@ -302,15 +302,23 @@ const fetchData = async (url) => {
 };
 
 const postData = async (url, body) => {
-    try {
-        await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
-        fetchData(url.includes("book") ? "/api/get_books" : "/api/get_messages");
-    } catch (error) {
-        document.getElementById("result").textContent = `Error: ${error.message}`;
+    if (!body.author || !body.title) {
+        alert('Missing book title or author')
+    }
+    else 
+    {
+
+        try {
+            await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
+            fetchData("/api/get_books");
+        } catch (error) {
+            document.getElementById("result").textContent = `Error: ${error.message}`;
+        }
     }
 };
 
@@ -321,7 +329,8 @@ const updateData = async (url, body) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
-        fetchData(url.includes("book") ? "/api/get_books" : "/api/get_messages");
+        // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
+        fetchData("/api/get_books");
     } catch (error) {
         document.getElementById("result").textContent = `Error: ${error.message}`;
     }
@@ -334,7 +343,7 @@ const deleteData = async (url, body) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
-        fetchData(url.includes("book") ? "/api/get_books" : "/api/get_messages");
+        fetchData("/api/get_books");
     } catch (error) {
         document.getElementById("result").textContent = `Error: ${error.message}`;
     }
