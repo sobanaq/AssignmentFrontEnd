@@ -9,10 +9,6 @@
   <body>
     <h1>My book wishlist</h1>
 
-    <h2>Messages</h2>
-    <button id="getMessages">Get Messages</button>
-    <button id="postMessage">Post New Message</button>
-
     <h2>Books</h2>
     <button id="getBooks">Get Books</button>
     
@@ -24,8 +20,7 @@
   <label for="author">Author:</label><br>
   <input type="text" id="author" ><br><br>
   <button onclick="postData('/api/new_book', { title: document.getElementById('title').value, author: document.getElementById('author').value })" id="postBook">Post New Book</button>
-  <button onclick="postData('/api/new_book', { title: document.getElementById('title').value, author: document.getElementById('author').value })" id="postBook">Post New Book</button>
-
+  
 
     <h2>Result</h2>
     <div id="result">Waiting for action...</div>

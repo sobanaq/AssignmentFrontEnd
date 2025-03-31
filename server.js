@@ -15,74 +15,40 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public')); // Serve static files from 'public' directory
+// Helper function to call Supabase Edge Functions
 
-// New POST endpoint
+const callSupabase = async (endpoint, method, body) => {
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : null,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
+  }
+
+  return response.json();
+};
+
+
+// CRUD for Books
 app.post('/api/new_book', async (req, res) => {
   try {
-
-    // Call the Supabase Edge Function for messages
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/books`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify(req.body)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const data = await callSupabase('books', 'POST', req.body);
     res.json(data);
   } catch (error) {
-    console.error('GET request error:', error);
+    console.error('POST request error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-//Delete endpoint
-app.delete('/api/delete_book', async (req, res) => {
-  try {
-
-    // Call the Supabase Edge Function for messages
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/books`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify(req.body)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('GET request error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// New GET endpoint
 app.get('/api/get_books', async (req, res) => {
   try {
-
-    // Call the Supabase Edge Function for messages
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/books`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const data = await callSupabase('books', 'GET');
     res.json(data);
   } catch (error) {
     console.error('GET request error:', error);
@@ -90,54 +56,148 @@ app.get('/api/get_books', async (req, res) => {
   }
 });
 
-// New POST endpoint
-app.post('/api/new_message', async (req, res) => {
+app.put('/api/update_book', async (req, res) => {
   try {
-
-    // Call the Supabase Edge Function for messages
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify(req.body)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const data = await callSupabase('books', 'PUT', req.body);
     res.json(data);
   } catch (error) {
-    console.error('GET request error:', error);
+    console.error('PUT request error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// New GET endpoint
-app.get('/api/messages', async (req, res) => {
+app.delete('/api/delete_book', async (req, res) => {
   try {
-
-    // Call the Supabase Edge Function for messages
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/messages`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const data = await callSupabase('books', 'DELETE', req.body);
     res.json(data);
   } catch (error) {
-    console.error('GET request error:', error);
+    console.error('DELETE request error:', error);
     res.status(500).json({ error: error.message });
   }
 });
+
+// // New POST endpoint
+// app.post('/api/new_book', async (req, res) => {
+//   try {
+
+//     // Call the Supabase Edge Function for messages
+//     const response = await fetch(`${SUPABASE_URL}/functions/v1/books`, {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+//       },
+//       body: JSON.stringify(req.body)
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     console.error('GET request error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// //Delete endpoint
+// app.delete('/api/delete_book', async (req, res) => {
+//   try {
+
+//     // Call the Supabase Edge Function for messages
+//     const response = await fetch(`${SUPABASE_URL}/functions/v1/books`, {
+//       method: 'DELETE',
+//       headers: {
+//         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+//       },
+//       body: JSON.stringify(req.body)
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     console.error('GET request error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // New GET endpoint
+// app.get('/api/get_books', async (req, res) => {
+//   try {
+
+//     // Call the Supabase Edge Function for book
+//     const response = await fetch(`${SUPABASE_URL}/functions/v1/books`, {
+//       method: 'GET',
+//       headers: {
+//         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+//       }
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     console.error('GET request error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // New POST endpoint
+// app.post('/api/new_message', async (req, res) => {
+//   try {
+
+//     // Call the Supabase Edge Function for messages
+//     const response = await fetch(`${SUPABASE_URL}/functions/v1/messages`, {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+//       },
+//       body: JSON.stringify(req.body)
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     console.error('GET request error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // New GET endpoint
+// app.get('/api/messages', async (req, res) => {
+//   try {
+
+//     // Call the Supabase Edge Function for messages
+//     const response = await fetch(`${SUPABASE_URL}/functions/v1/messages`, {
+//       method: 'GET',
+//       headers: {
+//         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+//       }
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
+//     }
+
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     console.error('GET request error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 // Start server
 app.listen(PORT, () => {
