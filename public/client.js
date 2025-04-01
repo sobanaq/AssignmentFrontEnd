@@ -6,15 +6,14 @@ const fetchData = async (url) => {
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data = await response.json();
 
-        // if we get some results from the database then we should create some rows of data in the table. the table should have a delete and update button 
         if (url.includes("books")) {
             const rowsData = data.map(entry => 
-                `<tr>
-                    <td>${entry.title}</td>
-                    <td>${entry.author}</td>
+                `<tr id="row-${entry.id}">
+                    <td><input type="text" id="title-${entry.id}" value="${entry.title}" /></td>
+                    <td><input type="text" id="author-${entry.id}" value="${entry.author}" /></td>
                     <td>${entry.ISBN || 'N/A'}</td>
                     <td>
-                        <button onclick="updateBookForm('${entry.id}', '${entry.title}', '${entry.author}', '${entry.ISBN}')">Update</button>
+                        <button onclick="saveUpdate('${entry.id}')">Save</button>
                         <button onclick="deleteData('/api/delete_book', { id: ${entry.id} })">Delete</button>
                     </td>
                 </tr>`
@@ -24,7 +23,7 @@ const fetchData = async (url) => {
                 <tr><th>Title</th><th>Author</th><th>ISBN</th><th>Actions</th></tr>
                 ${rowsData}
             </table>`;
-            return data
+            return data;
         } else {
             resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
         }
@@ -33,66 +32,6 @@ const fetchData = async (url) => {
     }
 };
 
-// export const postData = async (url, body) => {
-//     if (!body.author || !body.title) {
-//         alert('Missing book title or author')
-//     }
-//     else 
-//     {
-
-//         try {
-//             await fetch(url, {
-//                 method: "POST",
-//                 headers: { "Content-Type": "application/json" },
-//                 body: JSON.stringify(body),
-//             });
-//             // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
-//             fetchData("/api/get_books");
-//         } catch (error) {
-//             document.getElementById("result").textContent = `Error: ${error.message}`;
-//         }
-//     }
-// };
-
-export const postData = async (url, body) => {
-    if (!body.author || !body.title) {
-        alert('Missing book title or author');
-        return;
-    }
-
-    try {
-        await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
-
-        // Fetch updated book list after adding a new book
-        return await fetchData("/api/get_books");
-    } catch (error) {
-        document.getElementById("result").textContent = `Error: ${error.message}`;
-    }
-};
-
-
-// const updateData = async (url, body) => {
-
-//     try {
-//         await fetch(url, {
-//             method: "PUT",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify(body),
-//         });
-//         // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
-        
-        
-//         // after we update the book we should get the latest data to get the updated book
-//         const books = await fetchData("/api/get_books");
-//         return books
-//     } catch (error) {
-//         document.getElementById("result").textContent = `Error: ${error.message}`;
-//     }
-// };
 const updateData = async (url, body) => {
     try {
         await fetch(url, {
@@ -100,52 +39,60 @@ const updateData = async (url, body) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
-
-        // Fetch updated book list after updating
-        return await fetchData("/api/get_books");
+        await fetchData("/api/get_books");  
     } catch (error) {
         document.getElementById("result").textContent = `Error: ${error.message}`;
     }
 };
 
 
+const deleteData = async (id) => {  
+    console.log("Deleting book with ID:", id);
 
-const deleteData = async (url, body) => {
+    const response = await fetch('/api/delete_book', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+    });
+
+    const data = await response.json();
+    console.log("Delete response:", data);
+
+    if (response.ok) {
+        alert("Book deleted successfully!");
+        location.reload(); 
+    } else {
+        alert("Error deleting book: " + data.error);
+    }
+};
+
+
+window.deleteData = deleteData;
+
+
+
+const postData = async (url, body) => {
     try {
-        await fetch(url, {
-            method: "DELETE",
+        const response = await fetch(url, {
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
 
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-        // after we deleted the book we should get the latest data because a book was deleted
-        fetchData("/api/get_books");
+        const data = await response.json();
+        fetchData("/api/get_books"); 
     } catch (error) {
         document.getElementById("result").textContent = `Error: ${error.message}`;
     }
 };
 
+window.postData = postData;
+
+
 document.getElementById("getBooks").addEventListener("click", () => fetchData("/api/get_books"));
-document.getElementById("postBook").addEventListener("click", () => postData("/api/new_book", { title: document.getElementById('title').value, author: document.getElementById('author').value }));
-
-// const updateBookForm = (id, title, author, ISBN) => {
-//     document.getElementById("bookFormTitle").textContent = "Update Book"
-//     document.getElementById("title").value = title
-//     document.getElementById("author").value = author
-//     document.getElementById("postBook").htm = "Update Book"
-    
-//     document.getElementById("postBook").removeEventListener("click");
-//     document.getElementById("postBook").addEventListener("click", () => updateData("/api/update_book", { id, title: document.getElementById('title').value, author: document.getElementById('author').value }));
-// }
-const updateBookForm = (id, title, author, ISBN) => {
-    document.getElementById("bookFormTitle").textContent = "Update Book";
-    document.getElementById("title").value = title;
-    document.getElementById("author").value = author;
-    const postBookButton = document.getElementById("postBook");
-
-    postBookButton.textContent = "Update Book";
-    postBookButton.onclick = () => {
-        updateData("/api/update_book", { id, title: document.getElementById('title').value, author: document.getElementById('author').value });
-    };
-};
+document.getElementById("postBook").addEventListener("click", () => postData("/api/new_book", { 
+    title: document.getElementById('title').value, 
+    author: document.getElementById('author').value 
+}));

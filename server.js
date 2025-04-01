@@ -1,9 +1,8 @@
-// server.js
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -11,72 +10,80 @@ const PORT = process.env.PORT || 3000;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
+// Initialize Supabase client
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.static('public')); // Serve static files from 'public' directory
-// Helper function to call Supabase Edge Functions
+app.use(express.json()); // Parse JSON bodies
 
-const callSupabase = async (endpoint, method, body) => {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : null,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Supabase returned ${response.status}: ${response.statusText}`);
-  }
-
-  return response.json();
-};
-
-
-// CRUD for Books
-app.post('/api/new_book', async (req, res) => {
-  try {
-    const data = await callSupabase('books', 'POST', req.body);
-    res.json(data);
-  } catch (error) {
-    console.error('POST request error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
+// Handle GET request - Fetch all books
 app.get('/api/get_books', async (req, res) => {
   try {
-    const data = await callSupabase('books', 'GET');
+    const { data, error } = await supabase
+      .from('books')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
     res.json(data);
   } catch (error) {
-    console.error('GET request error:', error);
+    console.error('Error fetching books:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
+// Handle POST request - Add a new book
+app.post('/api/new_book', async (req, res) => {
+  try {
+    const { author, title, ISBN } = req.body;
+    const { data, error } = await supabase
+      .from('books')
+      .insert([{ author, title, ISBN }]);
+    if (error) throw error;
+    res.json({ success: true, message: 'Book added!', data });
+  } catch (error) {
+    console.error('Error adding book:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Handle PUT request - Update book details
 app.put('/api/update_book', async (req, res) => {
   try {
-    const data = await callSupabase('books', 'PUT', req.body);
-    res.json(data);
+    const { id, author, title, ISBN } = req.body;
+    const { data, error } = await supabase
+      .from('books')
+      .update({ author, title, ISBN })
+      .eq('id', id);
+    if (error) throw error;
+    res.json({ success: true, message: 'Book updated!', data });
   } catch (error) {
-    console.error('PUT request error:', error);
+    console.error('Error updating book:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
+// Handle DELETE request - Remove a book
 app.delete('/api/delete_book', async (req, res) => {
   try {
-    const data = await callSupabase('books', 'DELETE', req.body);
-    res.json(data);
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({ error: 'Missing ID' });
+    }
+
+    const { data, error } = await supabase
+      .from('books')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    res.json({ success: true, message: 'Book deleted!', data });
   } catch (error) {
-    console.error('DELETE request error:', error);
+    console.error('Error deleting book:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Start server
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Proxy server running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
