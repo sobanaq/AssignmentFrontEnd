@@ -24,6 +24,7 @@ const fetchData = async (url) => {
                 <tr><th>Title</th><th>Author</th><th>ISBN</th><th>Actions</th></tr>
                 ${rowsData}
             </table>`;
+            return data
         } else {
             resultElement.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
         }
@@ -32,7 +33,7 @@ const fetchData = async (url) => {
     }
 };
 
-const postData = async (url, body) => {
+export const postData = async (url, body) => {
     if (!body.author || !body.title) {
         alert('Missing book title or author')
     }
@@ -64,7 +65,8 @@ const updateData = async (url, body) => {
         
         
         // after we update the book we should get the latest data to get the updated book
-        fetchData("/api/get_books");
+        const books = await fetchData("/api/get_books");
+        return books
     } catch (error) {
         document.getElementById("result").textContent = `Error: ${error.message}`;
     }
