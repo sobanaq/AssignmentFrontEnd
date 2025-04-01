@@ -33,27 +33,66 @@ const fetchData = async (url) => {
     }
 };
 
+// export const postData = async (url, body) => {
+//     if (!body.author || !body.title) {
+//         alert('Missing book title or author')
+//     }
+//     else 
+//     {
+
+//         try {
+//             await fetch(url, {
+//                 method: "POST",
+//                 headers: { "Content-Type": "application/json" },
+//                 body: JSON.stringify(body),
+//             });
+//             // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
+//             fetchData("/api/get_books");
+//         } catch (error) {
+//             document.getElementById("result").textContent = `Error: ${error.message}`;
+//         }
+//     }
+// };
+
 export const postData = async (url, body) => {
     if (!body.author || !body.title) {
-        alert('Missing book title or author')
+        alert('Missing book title or author');
+        return;
     }
-    else 
-    {
 
-        try {
-            await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-            });
-            // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
-            fetchData("/api/get_books");
-        } catch (error) {
-            document.getElementById("result").textContent = `Error: ${error.message}`;
-        }
+    try {
+        await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+
+        // Fetch updated book list after adding a new book
+        return await fetchData("/api/get_books");
+    } catch (error) {
+        document.getElementById("result").textContent = `Error: ${error.message}`;
     }
 };
 
+
+// const updateData = async (url, body) => {
+
+//     try {
+//         await fetch(url, {
+//             method: "PUT",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify(body),
+//         });
+//         // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
+        
+        
+//         // after we update the book we should get the latest data to get the updated book
+//         const books = await fetchData("/api/get_books");
+//         return books
+//     } catch (error) {
+//         document.getElementById("result").textContent = `Error: ${error.message}`;
+//     }
+// };
 const updateData = async (url, body) => {
     try {
         await fetch(url, {
@@ -61,16 +100,15 @@ const updateData = async (url, body) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
-        // fetchData(url.includes("book") ? "/api/get_books" : "/api/get_users");
-        
-        
-        // after we update the book we should get the latest data to get the updated book
-        const books = await fetchData("/api/get_books");
-        return books
+
+        // Fetch updated book list after updating
+        return await fetchData("/api/get_books");
     } catch (error) {
         document.getElementById("result").textContent = `Error: ${error.message}`;
     }
 };
+
+
 
 const deleteData = async (url, body) => {
     try {
@@ -91,12 +129,23 @@ const deleteData = async (url, body) => {
 document.getElementById("getBooks").addEventListener("click", () => fetchData("/api/get_books"));
 document.getElementById("postBook").addEventListener("click", () => postData("/api/new_book", { title: document.getElementById('title').value, author: document.getElementById('author').value }));
 
-const updateBookForm = (id, title, author, ISBN) => {
-    document.getElementById("bookFormTitle").textContent = "Update Book"
-    document.getElementById("title").value = title
-    document.getElementById("author").value = author
-    document.getElementById("postBook").htm = "Update Book"
+// const updateBookForm = (id, title, author, ISBN) => {
+//     document.getElementById("bookFormTitle").textContent = "Update Book"
+//     document.getElementById("title").value = title
+//     document.getElementById("author").value = author
+//     document.getElementById("postBook").htm = "Update Book"
     
-    document.getElementById("postBook").removeEventListener("click");
-    document.getElementById("postBook").addEventListener("click", () => updateData("/api/update_book", { id, title: document.getElementById('title').value, author: document.getElementById('author').value }));
-}
+//     document.getElementById("postBook").removeEventListener("click");
+//     document.getElementById("postBook").addEventListener("click", () => updateData("/api/update_book", { id, title: document.getElementById('title').value, author: document.getElementById('author').value }));
+// }
+const updateBookForm = (id, title, author, ISBN) => {
+    document.getElementById("bookFormTitle").textContent = "Update Book";
+    document.getElementById("title").value = title;
+    document.getElementById("author").value = author;
+    const postBookButton = document.getElementById("postBook");
+
+    postBookButton.textContent = "Update Book";
+    postBookButton.onclick = () => {
+        updateData("/api/update_book", { id, title: document.getElementById('title').value, author: document.getElementById('author').value });
+    };
+};
