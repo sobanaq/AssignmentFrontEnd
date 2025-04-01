@@ -12,24 +12,18 @@
     <h2>Books</h2>
     <button id="getBooks">Get Books</button>
     
-    <h2>New book form</h2>
+    <h2 id="bookFormTitle">New book form</h2>
 
 
   <label for="title">Book title:</label><br>
   <input type="text" id="title"><br>
   <label for="author">Author:</label><br>
   <input type="text" id="author" ><br><br>
-  <button onclick="postData('/api/new_book', { title: document.getElementById('title').value, author: document.getElementById('author').value })" id="postBook">Post New Book</button>
+  <button id="postBook" onclick="postData('/api/new_book', { title: document.getElementById('title').value, author: document.getElementById('author').value })">Post New Book</button>
   
 
     <h2>Result</h2>
     <div id="result">Waiting for action...</div>
-<button id="updateMessage">Update Message</button>
-<button id="deleteMessage">Delete Message</button>
-
-<div id="result"></div>
-
-
     <script src="client.js"></script>
   </body>
 </html>
