@@ -14,16 +14,13 @@
     
     <h2 id="bookFormTitle">New book form</h2>
 
-
-  <label for="title">Book title:</label><br>
-  <input type="text" id="title"><br>
-  <label for="author">Author:</label><br>
-  <input type="text" id="author" ><br><br>
-  <button id="postBook" onclick="postData('/api/new_book', { title: document.getElementById('title').value, author: document.getElementById('author').value })">Post New Book</button>
-  
-
+    <label for="title">Book Title:</label><br>
+    <input id="title" placeholder="Enter book title"><br>
+    <label for="author">Author:</label><br>
+    <input id="author" placeholder="Enter author name"><br>
+    <button id="postBook">Post New Book</button> 
     <h2>Result</h2>
     <div id="result">Waiting for action...</div>
-    <script src="client.js"></script>
+    <script type="module" src="client.js"></script>
   </body>
 </html>
