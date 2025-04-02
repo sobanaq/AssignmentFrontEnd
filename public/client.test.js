@@ -3,6 +3,24 @@ import { postData, fetchData, updateData, deleteData } from "./client.js";
 // Mock the fetch function globally
 global.fetch = jest.fn();
 
+// Mock the document and its methods
+beforeAll(() => {
+    global.document = {
+        getElementById: jest.fn().mockImplementation((id) => {
+            return {
+                addEventListener: jest.fn(),
+                textContent: "",
+                value: "",
+                id
+            };
+        }),
+        createElement: jest.fn().mockReturnValue({}),
+        body: {
+            appendChild: jest.fn(),
+        },
+    };
+});
+
 describe("Client API Functions", () => {
     beforeEach(() => {
         jest.clearAllMocks(); // Clear mocks before each test

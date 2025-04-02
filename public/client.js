@@ -1,5 +1,5 @@
 // This function fetches data from the server and populates the result div
-const fetchData = async (url) => {
+export const fetchData = async (url) => {
     const resultElement = document.getElementById("result");
     resultElement.textContent = "Loading...";
     try {
@@ -78,7 +78,7 @@ export const postData = async (url, body) => {
 };
 
 // Update book data on the server
-const updateData = async (url, body) => {
+export const updateData = async (url, body) => {
     try {
         await fetch(url, {
             method: "PUT",
@@ -92,7 +92,7 @@ const updateData = async (url, body) => {
 };
 
 // Delete book data from the server
-const deleteData = async (url, body) => {
+export const deleteData = async (url, body) => {
     try {
         await fetch(url, {
             method: "DELETE",
