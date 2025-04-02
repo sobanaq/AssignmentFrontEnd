@@ -6,14 +6,16 @@ const fetchData = async (url) => {
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data = await response.json();
 
+        // if we get some results from the database then we should create some rows of data in the table.
+        // the table should have a delete and update button 
         if (url.includes("books")) {
-            const rowsData = data.map(entry => 
-                `<tr id="row-${entry.id}">
-                    <td><input type="text" id="title-${entry.id}" value="${entry.title}" /></td>
-                    <td><input type="text" id="author-${entry.id}" value="${entry.author}" /></td>
+            const rowsData = data.map(entry =>
+                `<tr>
+                    <td>${entry.title}</td>
+                    <td>${entry.author}</td>
                     <td>${entry.ISBN || 'N/A'}</td>
                     <td>
-                        <button onclick="saveUpdate('${entry.id}')">Save</button>
+                        <button onclick="updateBookForm('${entry.id}', '${entry.title}', '${entry.author}', '${entry.ISBN}')">Update</button>
                         <button onclick="deleteData('/api/delete_book', { id: ${entry.id} })">Delete</button>
                     </td>
                 </tr>`
@@ -32,67 +34,8 @@ const fetchData = async (url) => {
     }
 };
 
-const updateData = async (url, body) => {
-    try {
-        await fetch(url, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
-        await fetchData("/api/get_books");  
-    } catch (error) {
-        document.getElementById("result").textContent = `Error: ${error.message}`;
+export const postData = async (url, body) => {
+    if (!body.author || !body.title) {
+        alert('Missing book title or author');
     }
-};
-
-
-const deleteData = async (id) => {  
-    console.log("Deleting book with ID:", id);
-
-    const response = await fetch('/api/delete_book', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-    });
-
-    const data = await response.json();
-    console.log("Delete response:", data);
-
-    if (response.ok) {
-        alert("Book deleted successfully!");
-        location.reload(); 
-    } else {
-        alert("Error deleting book: " + data.error);
-    }
-};
-
-
-window.deleteData = deleteData;
-
-
-
-const postData = async (url, body) => {
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-        });
-
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-
-        const data = await response.json();
-        fetchData("/api/get_books"); 
-    } catch (error) {
-        document.getElementById("result").textContent = `Error: ${error.message}`;
-    }
-};
-
-window.postData = postData;
-
-
-document.getElementById("getBooks").addEventListener("click", () => fetchData("/api/get_books"));
-document.getElementById("postBook").addEventListener("click", () => postData("/api/new_book", { 
-    title: document.getElementById('title').value, 
-    author: document.getElementById('author').value 
-}));
+}

@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Book Wishlist</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <h1>My Book Wishlist</h1>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>My book wishlist</h1>
 
     <h2>Books</h2>
     <button id="getBooks">Get Books</button>
     
-    <h2 id="bookFormTitle">New Book Form</h2>
+    <h2 id="bookFormTitle">New book form</h2>
 
-    <label for="title">Book Title:</label><br>
-    <input type="text" id="title"><br>
-    <label for="author">Author:</label><br>
-    <input type="text" id="author"><br><br>
-    
-    <button id="postBook">Post New Book</button>
+
+  <label for="title">Book title:</label><br>
+  <input type="text" id="title"><br>
+  <label for="author">Author:</label><br>
+  <input type="text" id="author" ><br><br>
+  <button id="postBook" onclick="postData('/api/new_book', { title: document.getElementById('title').value, author: document.getElementById('author').value })">Post New Book</button>
+  
 
     <h2>Result</h2>
     <div id="result">Waiting for action...</div>
-
-    <script type="module" src="client.js"></script>
-</body>
+    <script src="client.js"></script>
+  </body>
 </html>
