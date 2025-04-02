@@ -10,11 +10,12 @@ const fetchData = async (url) => {
         if (url.includes("books")) {
             const rowsData = data.map(entry =>
                 `<tr id="row-${entry.id}">
-                    <td>${entry.title}</td>
-                    <td>${entry.author}</td>
-                    <td>${entry.ISBN || 'N/A'}</td>
+                    <!-- Changed static text to input fields for inline editing -->
+                    <td><input type="text" class="title-input" data-id="${entry.id}" value="${entry.title}"></td> 
+                    <td><input type="text" class="author-input" data-id="${entry.id}" value="${entry.author}"></td> 
+                    <td><input type="text" class="isbn-input" data-id="${entry.id}" value="${entry.ISBN || 'N/A'}"></td> 
                     <td>
-                        <button class="update-btn" data-id="${entry.id}" data-title="${entry.title}" data-author="${entry.author}" data-isbn="${entry.ISBN || ''}">Update</button>
+                        <button class="update-btn" data-id="${entry.id}">Update</button> 
                         <button class="delete-btn" data-id="${entry.id}">Delete</button>
                     </td>
                 </tr>`
@@ -25,12 +26,18 @@ const fetchData = async (url) => {
                 ${rowsData}
             </table>`;
 
-            // Add event listeners for Update buttons
-            const updateButtons = document.querySelectorAll('.update-btn');
-            updateButtons.forEach(button => {
+            // ADDED: Event listeners for Update buttons
+            document.querySelectorAll('.update-btn').forEach(button => {
                 button.addEventListener('click', (event) => {
-                    const { id, title, author, isbn } = event.target.dataset;
-                    updateBookForm(id, title, author, isbn);
+                    const id = event.target.dataset.id;
+
+                    // Retrieve values from the input fields instead of button dataset
+                    const title = document.querySelector(`.title-input[data-id='${id}']`).value;
+                    const author = document.querySelector(`.author-input[data-id='${id}']`).value;
+                    const ISBN = document.querySelector(`.isbn-input[data-id='${id}']`).value;
+
+                    const updatedBody = { id, title, author, ISBN };
+                    updateData("/api/update_book", updatedBody); // Send update request
                 });
             });
 
@@ -122,7 +129,7 @@ const updateBookForm = (id, title, author, ISBN) => {
     document.getElementById("postBook").removeEventListener("click", postNewBook);
     document.getElementById("postBook").addEventListener("click", () => {
         const updatedBody = {
-            id,
+            id: document.getElementById('id').value,
             title: document.getElementById('title').value,
             author: document.getElementById('author').value,
             ISBN: document.getElementById('isbn').value
